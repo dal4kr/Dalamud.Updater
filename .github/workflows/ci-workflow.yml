@@ -4,6 +4,8 @@ on:
   push:
   pull_request:
 concurrency: build_xl
+permissions:
+  contents: write
 
 jobs:
   build-release:
@@ -27,10 +29,18 @@ jobs:
           ($env:REPO_NAME) >> VERSION
           ($env:BRANCH) >> VERSION
           ($env:COMMIT) >> VERSION
+      - name: Locate MSBuild
+        shell: pwsh
+        run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+            -latest `
+            -requires Microsoft.Component.MSBuild `
+            -find MSBuild\**\Bin\MSBuild.exe
+
+          echo "MSBUILD_PATH=$vsPath" >> $env:GITHUB_ENV
       - name: Build DotNet4 for Release
         run: |
-          cd "C:\Program Files\Microsoft Visual Studio\2026\Enterprise\MSBuild\Current\Bin\"
-           .\MSBuild.exe $Env:GITHUB_WORKSPACE\Dalamud.Updater.sln /t:Build /p:Configuration=Release
+          & "$env:MSBUILD_PATH" "$Env:GITHUB_WORKSPACE\Dalamud.Updater.sln" /t:Build /p:Configuration=Release
 
       - name: Create package
         shell: pwsh
@@ -68,10 +78,18 @@ jobs:
           ($env:REPO_NAME) >> VERSION
           ($env:BRANCH) >> VERSION
           ($env:COMMIT) >> VERSION
+      - name: Locate MSBuild
+        shell: pwsh
+        run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+            -latest `
+            -requires Microsoft.Component.MSBuild `
+            -find MSBuild\**\Bin\MSBuild.exe
+
+          echo "MSBUILD_PATH=$vsPath" >> $env:GITHUB_ENV
       - name: Build DotNet4 Master
         run: |
-          cd "C:\Program Files\Microsoft Visual Studio\2026\Enterprise\MSBuild\Current\Bin\"
-           .\MSBuild.exe $Env:GITHUB_WORKSPACE\Dalamud.Updater.sln /t:Build /p:Configuration=Release
+          & "$env:MSBUILD_PATH" "$Env:GITHUB_WORKSPACE\Dalamud.Updater.sln" /t:Build /p:Configuration=Release
       - name: Upload artifact
         uses: actions/upload-artifact@master
         with:
