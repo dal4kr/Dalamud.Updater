@@ -17,7 +17,9 @@ namespace XIVLauncher.Common.Dalamud
 {
     public class AssetManager
     {
-        private const string ASSET_STORE_URL = "https://aonyx.ffxiv.wang/Dalamud/Asset/Meta";
+        //private const string ASSET_STORE_URL = "https://aonyx.ffxiv.wang/Dalamud/Asset/Meta";
+        // Use original one!
+        private const string ASSET_STORE_URL = "https://raw.githubusercontent.com/goatcorp/DalamudAssets/refs/heads/master/asset.json";
 
         internal class AssetInfo
         {
@@ -98,21 +100,7 @@ namespace XIVLauncher.Common.Dalamud
 
             var fontUrls = new List<string>()
             {
-                "https://mirrors.aliyun.com/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "http://mirrors.pku.edu.cn/ctan/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirror.bjtu.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.bfsu.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.jlu.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.sustech.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.nju.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirror.nyist.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.tuna.tsinghua.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.cloud.tencent.com/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.ustc.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.huaweicloud.com/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirror.lzu.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirrors.zju.edu.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
-                "https://mirror.iscas.ac.cn/CTAN/fonts/notocjksc/NotoSansCJKsc-Medium.otf",
+                "https://github.com/googlefonts/noto-cjk/raw/main/Sans/Variable/TTF/Mono/NotoSansMonoCJKkr-VF.ttf",
             };
 
             foreach (var entry in assetFileDownloadList)

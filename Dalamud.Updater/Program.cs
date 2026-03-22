@@ -61,9 +61,6 @@ namespace Dalamud.Updater
                 form.Show();
             }
 
-            var formXL = new FormXL();
-            formXL.Show();
-
             Application.Run();
         }
 
@@ -83,7 +80,7 @@ namespace Dalamud.Updater
             foreach (var p in processes) { 
                 var hWnd = p.MainWindowHandle;
                 if (hWnd == IntPtr.Zero) {
-                    hWnd = FindWindow(null,"卫月更新器");
+                    hWnd = FindWindow(null, "DalamudUpdater");
                     GetWindowThreadProcessId(hWnd,out var pid);
                     if (pid == p.Id) {
                         ShowWindow(hWnd, 5);

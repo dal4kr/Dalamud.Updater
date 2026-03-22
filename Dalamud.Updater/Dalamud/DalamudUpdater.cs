@@ -49,10 +49,11 @@ namespace XIVLauncher.Common.Dalamud
         private readonly DirectoryInfo assetDirectory;
         private readonly DirectoryInfo configDirectory;
         //private readonly IUniqueIdCache? cache;
-        public const string REMOTE_BASE = "https://aonyx.ffxiv.wang/";
-        public const string REMOTE_VERSION = REMOTE_BASE + "Dalamud/Release/VersionInfo?track=";
-        public const string REMOTE_DOTNET = REMOTE_BASE + "Dalamud/Release/Runtime/DotNet/{0}";
-        public const string REMOTE_DESKTOP = REMOTE_BASE + "Dalamud/Release/Runtime/WindowsDesktop/{0}";
+        //public const string REMOTE_BASE = "https://aonyx.ffxiv.wang/";
+        //public const string REMOTE_VERSION = REMOTE_BASE + "Dalamud/Release/VersionInfo?track=";
+        //public const string REMOTE_DOTNET = REMOTE_BASE + "Dalamud/Release/Runtime/DotNet/{0}";
+        //public const string REMOTE_DESKTOP = REMOTE_BASE + "Dalamud/Release/Runtime/WindowsDesktop/{0}";
+        public const string REMOTE_VERSION = "https://raw.githubusercontent.com/dal4kr/Dalamud.Resources/refs/heads/main/Dalamud/VersionInfo.json";
         private readonly TimeSpan defaultTimeout = TimeSpan.FromMinutes(25);
         private static string onlineHash = string.Empty;
 
@@ -196,19 +197,20 @@ namespace XIVLauncher.Common.Dalamud
 
             client.DefaultRequestHeaders.Add("User-Agent", $"Dalamud.Updater v{Assembly.GetExecutingAssembly().GetName().Version}");
 
-            var versionInfoJsonRelease = await client.GetStringAsync(REMOTE_VERSION + "release").ConfigureAwait(false);
+            // Only support release version for now
+            var versionInfoJsonRelease = await client.GetStringAsync(REMOTE_VERSION).ConfigureAwait(false);
 
             DalamudVersionInfo versionInfoRelease = JsonConvert.DeserializeObject<DalamudVersionInfo>(versionInfoJsonRelease);
 
             DalamudVersionInfo? versionInfoStaging = null;
 
-            if (!string.IsNullOrEmpty(settings.DalamudBetaKey))
-            {
-                var versionInfoJsonStaging = await client.GetAsync(REMOTE_VERSION + GetBetaTrackName(settings)).ConfigureAwait(false);
+            //if (!string.IsNullOrEmpty(settings.DalamudBetaKey))
+            //{
+            //    var versionInfoJsonStaging = await client.GetAsync(REMOTE_VERSION + GetBetaTrackName(settings)).ConfigureAwait(false);
 
-                if (versionInfoJsonStaging.StatusCode != HttpStatusCode.BadRequest)
-                    versionInfoStaging = JsonConvert.DeserializeObject<DalamudVersionInfo>(await versionInfoJsonStaging.Content.ReadAsStringAsync().ConfigureAwait(false));
-            }
+            //    if (versionInfoJsonStaging.StatusCode != HttpStatusCode.BadRequest)
+            //        versionInfoStaging = JsonConvert.DeserializeObject<DalamudVersionInfo>(await versionInfoJsonStaging.Content.ReadAsStringAsync().ConfigureAwait(false));
+            //}
 
             return (versionInfoRelease, versionInfoStaging);
         }
@@ -237,8 +239,6 @@ namespace XIVLauncher.Common.Dalamud
 
             var versionInfoJson = JsonConvert.SerializeObject(remoteVersionInfo);
 
-            onlineHash = remoteVersionInfo.Hash;
-
             var addonPath = new DirectoryInfo(Path.Combine(this.addonDirectory.FullName, "Hooks"));
             var currentVersionPath = new DirectoryInfo(Path.Combine(addonPath.FullName, remoteVersionInfo.AssemblyVersion));
             var runtimePaths = new DirectoryInfo[]
@@ -248,7 +248,8 @@ namespace XIVLauncher.Common.Dalamud
                 new(Path.Combine(this.runtimeDirectory.FullName, "shared", "Microsoft.WindowsDesktop.App", remoteVersionInfo.RuntimeVersion)),
             };
 
-            if (!currentVersionPath.Exists || !IsIntegrity(currentVersionPath))
+            //if (!currentVersionPath.Exists || !IsIntegrity(currentVersionPath))
+            if (!currentVersionPath.Exists)
             {
                 Log.Information("[DUPDATE] Not found, redownloading");
                 SetOverlayProgress(IDalamudLoadingOverlay.DalamudUpdateStep.Dalamud);
@@ -275,7 +276,7 @@ namespace XIVLauncher.Common.Dalamud
                 Log.Information("[DUPDATE] Now starting for .NET Runtime {0}", remoteVersionInfo.RuntimeVersion);
 
                 var versionFile = new FileInfo(Path.Combine(this.runtimeDirectory.FullName, "version"));
-                var localVersion = "5.0.6"; // This is the version we first shipped. We didn't write out a version file, so we can't check it.
+                var localVersion = "10.0.0"; // This is the version we first shipped. We didn't write out a version file, so we can't check it.
                 if (versionFile.Exists)
                     localVersion = File.ReadAllText(versionFile.FullName);
 
@@ -347,6 +348,8 @@ namespace XIVLauncher.Common.Dalamud
 
         public static bool IsIntegrity(DirectoryInfo addonPath)
         {
+            // TODO: Disable integrity(hash) check for now
+            return true;
             var files = addonPath.GetFiles();
 
             try
@@ -517,10 +520,12 @@ namespace XIVLauncher.Common.Dalamud
                 runtimePath.Create();
             }
 
-            var dotnetUrl = string.Format(REMOTE_DOTNET, version);
-            var desktopUrl = string.Format(REMOTE_DESKTOP, version);
+            //var dotnetUrl = string.Format(REMOTE_DOTNET, version);
+            //var desktopUrl = string.Format(REMOTE_DESKTOP, version);
             //var dotnetUrl = $"https://dotnetcli.blob.core.windows.net/dotnet/Runtime/{version}/dotnet-runtime-{version}-win-x64.zip";
             //var desktopUrl = $"https://dotnetcli.blob.core.windows.net/dotnet/WindowsDesktop/{version}/windowsdesktop-runtime-{version}-win-x64.zip";
+            var dotnetUrl = $"https://builds.dotnet.microsoft.com/dotnet/Runtime/{version}/dotnet-runtime-{version}-win-x64.zip";
+            var desktopUrl = $"https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/{version}/windowsdesktop-runtime-{version}-win-x64.zip";
 
             var downloadPath = GetTempFileName();
 

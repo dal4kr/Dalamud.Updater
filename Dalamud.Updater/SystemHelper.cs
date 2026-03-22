@@ -12,11 +12,11 @@ namespace Dalamud.Updater
     {
         private SystemHelper() { }
         /// <summary>
-            /// 设置程序开机启动
+            /// 프로그램을 부팅 시 자동 실행하도록 설정
             /// </summary>
-            /// <param name="strAppPath">应用程序exe所在文件夹</param>
-            /// <param name="strAppName">应用程序exe名称</param>
-            /// <param name="bIsAutoRun">自动运行状态</param>
+            /// <param name="strAppPath">응용 프로그램 exe가 있는 폴더 경로</param>
+            /// <param name="strAppName">응용 프로그램 exe 이름</param>
+            /// <param name="bIsAutoRun">자동 실행 상태</param>
         public static void SetAutoRun(string strAppPath, string strAppName, bool bIsAutoRun)
         {
             try
@@ -24,7 +24,7 @@ namespace Dalamud.Updater
                 if (string.IsNullOrWhiteSpace(strAppPath)
                 || string.IsNullOrWhiteSpace(strAppName))
                 {
-                    throw new Exception("应用程序路径或名称为空！");
+                    throw new Exception("응용 프로그램 경로/이름이 비어 있습니다.");
                 }
                 RegistryKey reg = Registry.CurrentUser;
                 RegistryKey run = reg.CreateSubKey(@"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\");
@@ -48,10 +48,10 @@ namespace Dalamud.Updater
             }
         }
         /// <summary>
-            /// 判断是否开机启动
+            /// 부팅 시 자동 실행되는지 확인
             /// </summary>
-            /// <param name="strAppPath">应用程序路径</param>
-            /// <param name="strAppName">应用程序名称</param>
+            /// <param name="strAppPath">응용 프로그램 경로</param>
+            /// <param name="strAppName">응용 프로그램 이름</param>
             /// <returns></returns>
         public static bool IsAutoRun(string strAppPath, string strAppName)
         {

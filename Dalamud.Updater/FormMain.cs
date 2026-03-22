@@ -19,14 +19,11 @@ namespace Dalamud.Updater
 {
     public partial class FormMain : Form
     {
-        private const string UPDATEURL = "https://aonyx.ffxiv.wang/Updater/Release/VersionInfo";
-        private const string OTTERHOME = """
-            如需帮助或者反馈,请前往:
-            https://file.bluefissure.com/FFXIV/Dalamud
-            https://github.com/ottercorp/Dalamud.Updater
-            https://aonyx.ffxiv.wang/
-            QQ频道:https://pd.qq.com/s/9ehyfcha3
-            QQ频道:https://pd.ottercorp.net
+        private const string UPDATEURL = "https://raw.githubusercontent.com/dal4kr/Dalamud.Resources/refs/heads/main/Dalamud.Updater/VersionInfo.json";
+        private const string REPORT = """
+            문제 발생 시 충분히 확인 후 report
+            https://github.com/dal4kr/Dalamud.Updater/issues
+            https://discord.gg/UnRkQPMQFh
             """;
 
         // private List<string> pidList = new List<string>();
@@ -45,28 +42,14 @@ namespace Dalamud.Updater
 
         private readonly DalamudUpdater dalamudUpdater;
 
-        public string windowsTitle = "獭纪委 v" + Assembly.GetExecutingAssembly().GetName().Version;
+        // public string windowsTitle = "獭纪委 v" + Assembly.GetExecutingAssembly().GetName().Version;
+        public string windowsTitle = "Dalamud Updater v" + Assembly.GetExecutingAssembly().GetName().Version;
 
-        private int checkTimes = 0;
-        private int injectTimes = 0;
         private bool isCheckingUpdate = false;
 
         private void CheckUpdate()
         {
             isCheckingUpdate = true;
-            checkTimes++;
-            if (checkTimes == 8)
-            {
-                MessageBox.Show("点这么多遍干啥？", windowsTitle);
-            }
-            else if (checkTimes == 9)
-            {
-                MessageBox.Show("还点？", windowsTitle);
-            }
-            else if (checkTimes > 10)
-            {
-                MessageBox.Show("有问题你发日志，别搁这瞎几把点了", windowsTitle);
-            }
             dalamudUpdater.Run();
         }
 
@@ -134,7 +117,7 @@ namespace Dalamud.Updater
                 if (firstHideHint)
                 {
                     firstHideHint = false;
-                    this.DalamudUpdaterIcon.ShowBalloonTip(2000, "自启动成功", "放心，我会在后台偷偷干活的。", ToolTipIcon.Info);
+                    this.DalamudUpdaterIcon.ShowBalloonTip(2000, "자동 시작 성공", "Dalamud Updater 백그라운드에서 실행", ToolTipIcon.Info);
                 }
             }
             dalamudUpdater = new DalamudUpdater(addonDirectory, runtimeDirectory, assetDirectory, configDirectory);
@@ -156,21 +139,21 @@ namespace Dalamud.Updater
             switch (value)
             {
                 case DalamudUpdater.DownloadState.Failed:
-                    MessageBox.Show("更新Dalamud失败", windowsTitle, MessageBoxButtons.YesNo);
-                    setStatus("更新Dalamud失败");
+                    MessageBox.Show("Dalamud 업데이트 실패", windowsTitle, MessageBoxButtons.YesNo);
+                    setStatus("Dalamud 업데이트 실패");
                     break;
                 case DalamudUpdater.DownloadState.Unknown:
-                    setStatus("未知错误");
+                    setStatus("알수 없는 오류");
                     break;
                 case DalamudUpdater.DownloadState.NoIntegrity:
-                    setStatus("卫月与游戏不兼容");
+                    setStatus("Dalamud 버전 불일치 (호환X)");
                     break;
                 case DalamudUpdater.DownloadState.Done:
                     SetDalamudVersion();
-                    setStatus("更新成功");
+                    setStatus("업데이트 완료");
                     break;
                 case DalamudUpdater.DownloadState.Checking:
-                    setStatus("检查更新中...");
+                    setStatus("업데이트 확인 중...");
                     isCheckingUpdate = true;
                     break;
             }
@@ -178,7 +161,7 @@ namespace Dalamud.Updater
 
         public void SetDalamudVersion()
         {
-            var verStr = string.Format("卫月版本 : {0}", getVersion());
+            var verStr = string.Format("Dalamud : {0}", getVersion());
             if (this.labelVersion.InvokeRequired)
             {
                 Action<string> actionDelegate = (x) => { labelVersion.Text = x; };
@@ -236,7 +219,7 @@ namespace Dalamud.Updater
                 Directory.Delete(shitDalamud, true);
             }
 
-            var shitUIRes = Path.Combine(Directory.GetCurrentDirectory(), "XIVLauncher", "dalamudAssets", "UIRes");
+            var shitUIRes = Path.Combine(Directory.GetCurrentDirectory(), "XIVLauncherKR", "dalamudAssets", "UIRes");
             if (Directory.Exists(shitUIRes))
             {
                 Directory.Delete(shitUIRes, true);
@@ -263,19 +246,12 @@ namespace Dalamud.Updater
                 {
                     try
                     {
-                        if (this.isCheckingUpdate) throw new Exception("正在更新卫月...");
-                        //var newPidList = Process.GetProcessesByName("ffxiv_dx11").Where(process =>
-                        //{
-                        //    return !process.MainWindowTitle.Contains("FINAL FANTASY XIV");
-                        //}).ToList().ConvertAll(process => process.Id.ToString()).ToArray();
-                        //为什么我开了FF检测不到啊.jpg
-                        var newPidList = Process.GetProcesses().Where(process =>
+                        if (this.isCheckingUpdate) throw new Exception("Dalamud 업데이트 중...");
+                        var newPidList = Process.GetProcessesByName("ffxiv_dx11").Where(process =>
                         {
-                            if (process.ProcessName == "ffxiv_dx11" || process.ProcessName == "ffxiv")
-                            {
-                                return !process.MainWindowTitle.Contains("FINAL FANTASY XIV");
-                            }
-                            return false;
+                            // Sdo client check for CN server
+                            //return !process.MainWindowTitle.Contains("FINAL FANTASY XIV");
+                            return true;
                         }).ToList().ConvertAll(process => process.Id.ToString()).ToArray();
                         var newHash = String.Join(", ", newPidList).GetHashCode();
                         var oldPidList = this.comboBoxFFXIV.Items.Cast<Object>().Select(item => item.ToString()).ToArray();
@@ -299,13 +275,13 @@ namespace Dalamud.Updater
                                             var pid = int.Parse(pidStr);
                                             if (Process.GetProcessById(pid).ProcessName != "ffxiv_dx11")
                                             {
-                                                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "找不到游戏", $"进程{pid}不是dx11版FF。", ToolTipIcon.Warning);
+                                                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "게임 인식 실패", $"프로세스 ID {pid} 는 ffxiv_dx11이 아닙니다.", ToolTipIcon.Warning);
                                                 Log.Information("{pid} is not dx11", pid);
                                                 continue;
                                             }
                                             if (this.Inject(pid, (int)(this.config.InjectDelaySeconds * 1000)))
                                             {
-                                                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "帮你注入了", $"帮你注入了进程{pid}，不用谢。", ToolTipIcon.Info);
+                                                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "Injection 실패", $"프로세스 ID {pid} injection 실패", ToolTipIcon.Info);
                                             }
                                         }
                                     }
@@ -378,10 +354,11 @@ namespace Dalamud.Updater
 #endif
                         if (json.Version == null || json.DownloadUrl == null)
                         {
-                            throw new Exception($"远程版本配置文件错误:\n {args.RemoteData}");
+                            throw new Exception($"원격 버전 구성 파일 오류:\r\n {args.RemoteData}");
                         }
 
-                        json.ChangeLog ??= "https://bbs.tggfl.com/topic/32/dalamud-%E5%8D%AB%E6%9C%88%E6%A1%86%E6%9E%B6";
+                        //json.ChangeLog ??= "https://bbs.tggfl.com/topic/32/dalamud-%E5%8D%AB%E6%9C%88%E6%A1%86%E6%9E%B6";
+                        json.ChangeLog ??= "https://github.com/dal4kr";
                         args.UpdateInfo = new UpdateInfoEventArgs
                         {
                             CurrentVersion = json.Version,
@@ -406,7 +383,7 @@ namespace Dalamud.Updater
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"{ex.Message}\n{OTTERHOME}", "程序启动版本检查失败",
+                        MessageBox.Show($"{ex.Message}\r\n{REPORT}", "버전 확인 실패",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Error);
                     }
@@ -416,7 +393,7 @@ namespace Dalamud.Updater
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"{ex.Message}\n{OTTERHOME}", "程序启动版本检查失败",
+                MessageBox.Show($"{ex.Message}\r\n{REPORT}", "버전 확인 실패",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
@@ -439,7 +416,7 @@ namespace Dalamud.Updater
             if (firstHideHint)
             {
                 firstHideHint = false;
-                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "小玩意挺会藏", "哎我藏起来了，单击托盘图标呼出程序界面。", ToolTipIcon.Info);
+                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "Dalamud 최소화", "트레이 아이콘 클릭 시 창 활성화", ToolTipIcon.Info);
             }
         }
 
@@ -462,13 +439,13 @@ namespace Dalamud.Updater
             }
         }
 
-        private void 显示ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void showToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //WindowState = FormWindowState.Normal;
             if (!this.Visible) this.Visible = true;
             this.Activate();
         }
-        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Dispose();
             //this.Close();
@@ -484,7 +461,7 @@ namespace Dalamud.Updater
                 var process = Process.GetProcessById(pid);
                 if (isInjected(process))
                 {
-                    var choice = MessageBox.Show("经检测存在 ffxiv_dx11.exe 进程，更新卫月需要关闭游戏，需要帮您代劳吗？", "关闭游戏",
+                    var choice = MessageBox.Show("이미 ffxiv_dx11.exe 가 실행 중입니다.\r\n업데이트 확인을 위해 게임을 종료하시겠습니까?", "게임 종료?",
                                     MessageBoxButtons.YesNo,
                                     MessageBoxIcon.Information);
                     if (choice == DialogResult.Yes)
@@ -505,12 +482,7 @@ namespace Dalamud.Updater
 
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            Process.Start("https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=CZtWN&from=181074&biz=ka&shareSource=5");
-        }
-
-        public readonly string RoamingPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XIVLauncherCN");
+        public readonly string RoamingPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "XIVLauncherKR");
 
         private void DeleteLink()
         {
@@ -532,7 +504,7 @@ namespace Dalamud.Updater
             if (!Directory.Exists(Path.Combine(RoamingPath, "addon")))
             {
                 Log.Warning($"Moving Roaming to AppData");
-                var oldRoamingPath = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName, "XIVLauncher");
+                var oldRoamingPath = Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName, "XIVLauncherKR");
                 if (!Directory.Exists(oldRoamingPath)) return;
 
                 Directory.CreateDirectory(RoamingPath);
@@ -553,7 +525,7 @@ namespace Dalamud.Updater
 
             foreach (var directory in Directory.GetDirectories(sourcePath))
             {
-                if (sourcePath == Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName, "XIVLauncher"))
+                if (sourcePath == Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location)!.FullName, "XIVLauncherKR"))
                 {
                     if (!Needed.Contains(Path.GetFileName(directory)))
                         continue;
@@ -617,7 +589,7 @@ namespace Dalamud.Updater
                 {
                     if (process.Modules[j].ModuleName == "ws2detour_x64.dll")
                     {
-                        MessageBox.Show("检测到使用网易UU加速器进程模式,有可能注入无反应。\n请使用路由模式。", windowsTitle, MessageBoxButtons.OK);
+                        MessageBox.Show("네트워크 우회/가속 관련 호환 불가능한 모듈 확인 (중섭에서만 발생?)", windowsTitle, MessageBoxButtons.OK);
                     }
                 }
             }
@@ -640,10 +612,10 @@ namespace Dalamud.Updater
             catch (Exception ex)
             {
                 MessageBox.Show("""
-                    无法访问/打开进程
-                    1.请检查安全软件，将Dalamud程序以及相关目录加入白名单
-                    2.打开任务管理器，检查是否存在未完全退出且无响应的FFXIV进程,并尝试结束
-                    3.尝试重启电脑
+                    프로세스에 접근할 수 없습니다
+                    1. 보안 소프트웨어를 확인하고, Dalamud 프로그램 및 관련 폴더를 화이트리스트에 추가하세요.
+                    2. 작업 관리자를 열어 완전히 종료되지 않았거나 응답하지 않는 FFXIV 프로세스가 있는지 확인하고 종료를 시도하세요.
+                    3. 컴퓨터를 재시작해 보세요.
 
                     """ + ex.Message, windowsTitle, MessageBoxButtons.YesNo);
                 return true;
@@ -653,14 +625,13 @@ namespace Dalamud.Updater
 
         private bool Inject(int pid, int injectDelay = 0)
         {
-            injectTimes = 0;
             var process = Process.GetProcessById(pid);
             if (process.ProcessName != "ffxiv_dx11")
             {
                 Log.Error("{pid} is not dx11", pid);
-                if (MessageBox.Show("此进程并非dx11版FFXIV,无法使用Dalamud。\n解决方法:\n点击确定使用浏览器查看 https://www.yuque.com/ffcafe/act/dx11", windowsTitle, MessageBoxButtons.YesNo) != DialogResult.Yes)
+                if (MessageBox.Show("이 프로세스는 dx11버전이 아니라 Dalamud 사용 불가능합니다.", windowsTitle, MessageBoxButtons.YesNo) != DialogResult.Yes)
                 {
-                    Process.Start("https://www.yuque.com/ffcafe/act/dx11");
+                    //Process.Start("https://www.yuque.com/ffcafe/act/dx11");
                     return false;
                 }
             }
@@ -679,7 +650,7 @@ namespace Dalamud.Updater
             Log.Information($"[Updater] dalamudUpdater.State:{dalamudUpdater.State}");
             if (dalamudUpdater.State == DalamudUpdater.DownloadState.NoIntegrity)
             {
-                if (MessageBox.Show("当前Dalamud版本可能与游戏不兼容,确定注入吗？", windowsTitle, MessageBoxButtons.YesNo) != DialogResult.Yes)
+                if (MessageBox.Show("현재 Dalamud 버전이 게임과 호환되지 않을 수 있습니다. Injection 하시겠습니까?", windowsTitle, MessageBoxButtons.YesNo) != DialogResult.Yes)
                 {
                     return false;
                 }
@@ -700,23 +671,7 @@ namespace Dalamud.Updater
         private void ButtonInject_Click(object sender, EventArgs e)
         {
             if (this.isCheckingUpdate) {
-                injectTimes++;
-                if (injectTimes == 3)
-                {
-                    MessageBox.Show("麻烦耐心等待更新完成 ^_^", "正在更新", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else if (checkTimes == 4)
-                {
-                    MessageBox.Show("都说了“麻烦”“耐心”“等待” ^_^##", "正在更新", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else if (checkTimes > 5)
-                {
-                    MessageBox.Show("憋点啦！ -_-##", "正在更新", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    MessageBox.Show("请等更新完成之后再注入", "正在更新", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                MessageBox.Show("업데이트 이후 Injection 시도하세요.", "업데이트 중", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -733,14 +688,14 @@ namespace Dalamud.Updater
                 }
                 else
                 {
-                    MessageBox.Show("未能解析游戏进程ID", "找不到游戏",
+                    MessageBox.Show("프로세스 ID 파싱 실패", "게임 인식 실패",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
                 }
             }
             else
             {
-                MessageBox.Show("未选择游戏进程", "找不到游戏",
+                MessageBox.Show("프로세스 ID 선택 필요", "게임 인식 실패",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
@@ -856,16 +811,16 @@ namespace Dalamud.Updater
         {
             if (IsSymbolicLink(path))
             {
-                // 检查路径是文件还是目录，然后删除
+                // 파일/디렉토리 확인 후 삭제
                 if (Directory.Exists(path))
                 {
-                    // 如果是目录符号链接
+                    // 디렉토리 심볼릭 링크인 경우
                     Directory.Delete(path);
                     //Console.WriteLine($"Symbolic link directory '{path}' was deleted.");
                 }
                 else if (File.Exists(path))
                 {
-                    // 如果是文件符号链接
+                    // 파일 심볼릭 링크인 경우
                     File.Delete(path);
                     //Console.WriteLine($"Symbolic link file '{path}' was deleted.");
                 }
