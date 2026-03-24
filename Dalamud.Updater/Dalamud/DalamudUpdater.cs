@@ -239,6 +239,8 @@ namespace XIVLauncher.Common.Dalamud
 
             var versionInfoJson = JsonConvert.SerializeObject(remoteVersionInfo);
 
+            onlineHash = remoteVersionInfo.Hash;
+
             var addonPath = new DirectoryInfo(Path.Combine(this.addonDirectory.FullName, "Hooks"));
             var currentVersionPath = new DirectoryInfo(Path.Combine(addonPath.FullName, remoteVersionInfo.AssemblyVersion));
             var runtimePaths = new DirectoryInfo[]
@@ -248,8 +250,7 @@ namespace XIVLauncher.Common.Dalamud
                 new(Path.Combine(this.runtimeDirectory.FullName, "shared", "Microsoft.WindowsDesktop.App", remoteVersionInfo.RuntimeVersion)),
             };
 
-            //if (!currentVersionPath.Exists || !IsIntegrity(currentVersionPath))
-            if (!currentVersionPath.Exists)
+            if (!currentVersionPath.Exists || !IsIntegrity(currentVersionPath))
             {
                 Log.Information("[DUPDATE] Not found, redownloading");
                 SetOverlayProgress(IDalamudLoadingOverlay.DalamudUpdateStep.Dalamud);
@@ -348,8 +349,6 @@ namespace XIVLauncher.Common.Dalamud
 
         public static bool IsIntegrity(DirectoryInfo addonPath)
         {
-            // TODO: Disable integrity(hash) check for now
-            return true;
             var files = addonPath.GetFiles();
 
             try
