@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -315,6 +316,8 @@ namespace Dalamud.Updater
 
         private void UpdateSelf()
         {
+            // Some client does not support TLS 1.2 by default...
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
             AutoUpdater.ApplicationExitEvent += () =>
             {
                 this.Text = @"Closing application...";
@@ -327,6 +330,7 @@ namespace Dalamud.Updater
             AutoUpdater.InstalledVersion = GetUpdaterVersion();
             AutoUpdater.ShowRemindLaterButton = false;
             AutoUpdater.ShowSkipButton = false;
+            AutoUpdater.ReportErrors = true;
             AutoUpdater.UpdateMode = Mode.Normal;
             try
             {
@@ -358,7 +362,7 @@ namespace Dalamud.Updater
                         }
 
                         //json.ChangeLog ??= "https://bbs.tggfl.com/topic/32/dalamud-%E5%8D%AB%E6%9C%88%E6%A1%86%E6%9E%B6";
-                        json.ChangeLog ??= "https://github.com/dal4kr";
+                        json.ChangeLog ??= "https://raw.githubusercontent.com/dal4kr/Dalamud.Resources/refs/heads/main/Dalamud.Updater/Changelog";
                         args.UpdateInfo = new UpdateInfoEventArgs
                         {
                             CurrentVersion = json.Version,

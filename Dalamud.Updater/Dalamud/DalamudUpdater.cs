@@ -1,3 +1,9 @@
+using Dalamud.Updater;
+using Newtonsoft.Json;
+using Serilog;
+using SharpCompress.Archives.SevenZip;
+using SharpCompress.Common;
+using SharpCompress.Readers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,12 +18,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Dalamud.Updater;
-using Newtonsoft.Json;
-using Serilog;
-using SharpCompress.Archives.SevenZip;
-using SharpCompress.Common;
-using SharpCompress.Readers;
+using System.Windows.Forms;
 //using XIVLauncher.Common.PlatformAbstractions;
 using XIVLauncher.Common.Util;
 
