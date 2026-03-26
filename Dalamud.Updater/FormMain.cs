@@ -330,7 +330,7 @@ namespace Dalamud.Updater
             AutoUpdater.InstalledVersion = GetUpdaterVersion();
             AutoUpdater.ShowRemindLaterButton = false;
             AutoUpdater.ShowSkipButton = false;
-            AutoUpdater.ReportErrors = true;
+            //AutoUpdater.ReportErrors = true;
             AutoUpdater.UpdateMode = Mode.Normal;
             try
             {
