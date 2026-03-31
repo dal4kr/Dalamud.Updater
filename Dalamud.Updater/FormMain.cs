@@ -282,7 +282,7 @@ namespace Dalamud.Updater
                                             }
                                             if (this.Inject(pid, (int)(this.config.InjectDelaySeconds * 1000)))
                                             {
-                                                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "Injection 실패", $"프로세스 ID {pid} injection 실패", ToolTipIcon.Info);
+                                                this.DalamudUpdaterIcon.ShowBalloonTip(2000, "Injection 성공", $"프로세스 ID {pid} injection 성공", ToolTipIcon.Info);
                                             }
                                         }
                                     }
