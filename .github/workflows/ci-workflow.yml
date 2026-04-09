@@ -55,7 +55,7 @@ jobs:
         with:
           files: ./release.zip
           name: Release ${{ github.ref }}
-          prerelease: true
+          prerelease: false
 
   build:
     name: Build on Windows
