@@ -194,9 +194,11 @@ namespace XIVLauncher.Common.Dalamud
             client.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
             {
                 NoCache = true,
+                NoStore = true,
             };
 
             client.DefaultRequestHeaders.Add("User-Agent", $"Dalamud.Updater v{Assembly.GetExecutingAssembly().GetName().Version}");
+            client.DefaultRequestHeaders.Add("Pragma", "no-cache");
 
             // Only support release version for now
             var versionInfoJsonRelease = await client.GetStringAsync(REMOTE_VERSION).ConfigureAwait(false);
